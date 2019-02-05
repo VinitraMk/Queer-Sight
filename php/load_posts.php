@@ -11,24 +11,29 @@ if(isset($db)) {
     #echo "Res: ".$row;
     $page_content=""; 
     while($row=mysqli_fetch_array($res,MYSQLI_ASSOC)) {
-        $puserid=$row['uid'];
-        $sql="SELECT * FROM User WHERE uid='$puserid'";
+        $puserid=$row['user_id'];
+        $sql="SELECT * FROM quser WHERE user_id='$puserid'";
         $res1=mysqli_query($db,$sql);
         $co1=mysqli_num_rows($res1);
         if($co1==1) {
             $userrow=mysqli_fetch_array($res1,MYSQLI_ASSOC);
             $page_content.="<div class='post-preview'>
             <a href='post.html'>
-              <h2 class='post-title'>".$row['ptitle']."
+              <h2 class='post-title'>".$row['title']."
               </h2>
-              <h3 class='post-subtitle'>".$row['pcontent']."
+              <h3 class='post-subtitle'>".$row['content']."
               </h3>
-            </a>
-            <p class='post-meta'>Posted by
-              <a href='#'>".$userrow['Name']."</a>
-              on ".$row['pdate']."</p>
-          </div>
-          <hr>";
+            </a>\n";
+            if($row['video_url']!="") {
+                $turl=$row['video_url'];
+                $page_content.="\n<iframe width='320' height='240' src='$turl'?rel=0></iframe>\n";
+            }
+
+            $page_content.="<p class='post-meta'>Posted by
+              <a href='#'>".$userrow['name']."</a>
+              on ".$row['date']."</p>
+          </div>";
+            $page_content.="<hr>";
         }
     }
     echo "".$page_content;

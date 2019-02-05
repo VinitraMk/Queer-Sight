@@ -6,64 +6,86 @@
 <html lang="en">
 	<head>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
 
-    <title>Clean Blog - Start Bootstrap Theme</title>
+		<title>Clean Blog - Start Bootstrap Theme</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="./vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
+		<!-- Bootstrap core CSS -->
+		<link href="./vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+		<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
 
-	<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+		<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+		<link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
 
-	<!-- Custom styles for this template -->
-    <link href="./css/clean-blog.min.css" rel="stylesheet">
+		<!-- Custom styles for this template -->
+		<link href="./css/clean-blog.min.css" rel="stylesheet">
 
 
-	<!-- Bootstrap core JavaScript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-
-    
+		<!-- Bootstrap core JavaScript -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		<!-- Custom scripts for this template -->
+		<script src="./js/clean-blog.min.js"></script>
+		
 	
-
-
-    <script type="text/javascript">
-    "use strict";
-    function addpost() {
-        console.log("entered addpost");
-        var ptitle=document.getElementById("title").value;
-        var pcont=document.getElementById("content").value;
-        var vidurl=document.getElementById("video").value;
-        if(ptitle && pcont) {
-            console.log("calling ajax "+ptitle+","+pcont);
-            $.ajax({
-                method:'POST',
-                url:'php/add_post.php',
-                data:{
-                    title:ptitle,
-                    cont:pcont,
-                    vurl:vidurl,
-                },
-                dataType:"text",
-                success: function (response) {
-                    //alert(response);
-                }
+        <script>
+            $(document).ready(function () {
+                $('#posts').load('php/load_posts.php').fadeIn("slow");
             });
-        }
-    }
+        </script>
+
+		<script type="text/javascript">
+
+			function getId(url) {
+				var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+				var match = url.match(regExp);
+
+				if (match && match[2].length == 11) {
+					return match[2];
+				} else {
+					return 'error';
+				}
+			}
+            function addpost() {
+                console.log("entered addpost");
+                var ptitle=document.getElementById("title").value;
+                var pcont=document.getElementById("content").value;
+                var turl=document.getElementById("video").value;
+                var vidurl="";
+                if(turl.length>0) {
+                    var vidurl=getId(turl);
+                    vidurl='http://www.youtube.com/embed/'+vidurl;
+                }
+				console.log(vidurl);
+				
+                if(ptitle && pcont) {
+                    console.log("calling ajax "+ptitle+","+pcont);
+                    $.ajax({
+                        method:'POST',
+                        url:'php/add_post.php',
+                        data:{
+                            title:ptitle,
+                            cont:pcont,
+                            vurl:vidurl,
+                        },
+                        dataType:"text",
+                        success: function (response) {
+                            //alert(response);
+                            document.getElementById('posts').innerHTML=response;
+                        }
+                    });
+                }
+            }
 
 
-    setInterval(function() {
-        $('#posts').load('php/load_posts.php').fadeIn("slow");
-    },1000);
-    </script>
-
+            /*setInterval(function() {
+                $('#posts').load('php/load_posts.php').fadeIn("slow");
+            },1000);*/
+		</script>
 
     </head>
 	
@@ -134,45 +156,41 @@
     <div class="container">
 		<?php
 			if(isset($_SESSION['user_logged'])) {
-				echo "<div class='clearfix'>
-				          <a class='btn btn-primary float-right' href='#' data-toggle='modal' data-target='#postmodal'>Post  &rarr;</a>
-				      </div>
-				      <div id='postmodal' class='modal fade' role='dialog'>
-				        <div class='modal-dialog'>
-				            <div class='modal-content'>
-				                <div class='modal-header'>
-				                    <h4 class='modal-title'>What's in your mind?</h4>
-				                    <button type='button' class='close' data-dismiss='modal'>&times;</button>
-				                </div>
-				                <div class='modal-body'>
-									<form method='POST' action='' onsubmit=''>
-										<div class='form-group'>
-											<label for='title'>Title</label>
-											<input id='title' type='text' class='form-control' name='title' value='' required autofocus>
-										</div>
-
-										<div class='form-group'>
-											<label for='content'>Content</label>
-											<input id='content' type='text' class='form-control' name='content' style='height:20vh;' required data-eye>
-										</div>
-
-										<div class='form-group'>
-											<label for='video'>Video Url
-											</label>
-											<input id='video' type='text' class='form-control' name='video' placeholder='Paste only youtube url here..' required data-eye>
-										</div>
-
-										<div class='form-group no-margin'>
-											<button type='submit' class='btn btn-primary btn-block' name='post' onclick='addpost()'>
+				echo "	<div class='clearfix'>
+				          	<button type='button' class='btn btn-primary float-right' id='addpost' data-toggle='modal' data-target='#postmodal'>Post  &rarr;</button>
+				      	</div>
+						<div id='postmodal' class='modal' role='dialog'>
+							<div class='modal-dialog'>
+								<div class='modal-content'>
+									<div class='modal-header'>
+										<h4 class='modal-title'>Whats in your mind?</h4>
+										<button type='button' class='close' data-dismiss='modal'>&times;</button>
+									</div>
+									<div class='modal-body'>
+										<form method='POST' action='' onsubmit=''>
+											<div class='form-group'>
+												<label for='title'>Title</label>
+												<input id='title' type='text' class='form-control' name='title' value='' required autofocus>
+											</div>
+											<div class='form-group'>
+												<label for='content'>Content</label>
+												<input id='content' type='text' class='form-control' name='content' style='height:20vh;' required data-eye>
+											</div>
+											<div class='form-group'>
+												<label for='video'>Video Url</label>
+												<input id='video' type='text' class='form-control' name='video' placeholder='Paste only youtube url here..'>
+											</div>
+											<div class='form-group no-margin'>
+												<button type='submit' class='btn btn-primary btn-block' name='post' onclick='addpost()'>
 												Post	
-											</button>
-										</div>
-									</form>
+												</button>
+											</div>
+										</form>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>";
-
+						<hr>";
 			}
 				    
 		?>
@@ -184,7 +202,7 @@
 		</div>
     </div>
 
-    <hr>
+	
 
 
 	<!-- Footer -->
@@ -226,8 +244,7 @@
 
 	 
 
-    <!-- Custom scripts for this template -->
-    <script src="./js/clean-blog.min.js"></script>
+    
 	</body>
 
 	
