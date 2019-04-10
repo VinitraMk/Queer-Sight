@@ -11,7 +11,7 @@
 		<meta name="description" content="">
 		<meta name="author" content="">
 
-		<title>Clean Blog - Start Bootstrap Theme</title>
+		<title>Support Circle</title>
 
 		<!-- Bootstrap core CSS -->
 		<link href="./vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
@@ -29,7 +29,36 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 		<!-- Custom scripts for this template -->
-		<script src="./js/clean-blog.min.js"></script>
+        <script src="./js/clean-blog.min.js"></script>
+
+        <script type="text/javascript">
+            var delete_id=-1;
+            function deletePost(post_id) {
+                console.log("clicked delete");
+                $("#deletemodal").modal();
+                delete_id=post_id;
+            }
+
+            function yesDeletePost() {
+                $("#deletemodal").modal("hide");
+                console.log(delete_id);
+                $.ajax({
+                    type:'POST',
+                    url:'php/delete_post.php',
+                    data:{
+                        post_id:delete_id,
+                    },
+                    success: function(response) {
+                        alert(response);
+                        $('#posts').load('php/load_posts.php').fadeIn("slow");
+                    },
+                    error:function() {
+                        console.log("error");
+                    }
+                });
+            }
+        </script>
+
 		
 	
         <script>
@@ -80,58 +109,75 @@
                     });
                 }
             }
+        </script>
 
-
-            /*setInterval(function() {
-                $('#posts').load('php/load_posts.php').fadeIn("slow");
-            },1000);*/
-		</script>
-
+        <script>
+            function showmore() {
+                document.getElementById("userdropdown").classList.toggle("show");
+            }
+            window.onclick=function(event) {
+                if(!event.target.matches('.dropbtn')) {
+                    var dropdowns=document.getElementByClassName("dropdown-content");
+                    var i;
+                    for(i=0;i<dropdowns.length;i++) {
+                        var openDropdown=dropdowns[i];
+                        if(openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
+                    }        
+                }
+            }
+        </script>
+        
     </head>
 	
 	<body>
   
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
-		<div class="container">
-		    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-		      Menu
-		      <i class="fas fa-bars"></i>
+        <div class="container">
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+		        Menu
+		    <i class="fas fa-bars"></i>
 		    </button>
 		    <div class="collapse navbar-collapse" id="navbarResponsive">
 		        <ul class="navbar-nav ml-auto">
 				    <li class="nav-item">
 				        <a class="nav-link" href="index.php">Home</a>
 				    </li>
-					<?php
-
-		                              if(isset($_SESSION["user_logged"])) {
-		                                  $logged_user=$_SESSION["user_name"];
-		                                  echo "<li class='nav-item'>
-		                                            <a class='dropdown-toggle' data-toggle='dropdown' href='#'>".$logged_user."</a>
-		                                            <span class='caret'></span>
-		                                            <ul class='dropdown-menu'>
-		                                                <li><a href='#'>Profile</a></li>
-		                                            </ul>
-		                                        </li>
-		                                        <li class='nav-item'>
-		                                            <a href='php/logout.php'>Logout</a>
-		                                        </li>";
-		                              }
-		                              else {
-		                                  $logged_user="public_user";
-		                                  echo "<li class='nav-item'>
-		                                            <a href='login.html'>Login</a>
-		                                        </li>
-		                                        <li class='nav-item'>
-		                                            <a class='nav-link' href='signup.html'>Sign Up</a>
-		                                        </li>";
-		                              }
+                    <?php
+                        if(isset($_SESSION["user_logged"])) {
+                            $logged_user=$_SESSION["user_name"];
+                            echo "<li class='nav-item dropdown'>
+                                      <a class='dropbtn'>".$logged_user."</a>
+                                      <div class='dropdown-content'>
+                                          <a href='profile.php'>Profile</a>
+                                          <a href='#'>Link 2</a>
+                                      </div>
+                                  </li>  
+                                  <li class='nav-item'>
+                                      <a href='php/logout.php'>Logout</a>
+                                  </li>
+                                  <li class='nav-item'>
+                                      <a class='nav-link' href='news_feeds.php'>News Feeds</a>
+                                  </li>
+                                  ";
+                        }
+                        else {
+                            $logged_user="public_user";
+                            echo "<li class='nav-item'>
+                                      <a href='login.html'>Login</a>
+                                  </li>
+                                  <li class='nav-item'>
+                                      <a class='nav-link' href='signup.html'>Sign Up</a>
+                                  </li>";
+                        }
 		        	?>
-
+                    <!--
 				    <li class="nav-item">
-				        <a class="nav-link" href="contact.html">Contact</a>
-				    </li>
+				        <a class="nav-link" href="news_feeds.php">News Feeds</a>
+                    </li>
+                    -->
 				</ul>
 			</div>
 		</div>
@@ -199,7 +245,23 @@
 		    <div class="col-lg-8 col-md-10 mx-auto" id='posts'>           
 		    <!-- Pager -->
 		    </div>
-		</div>
+        </div>
+        <div id="deletemodal" class="modal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Delete Post?</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Do you wish to delete this post?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" onclick="yesDeletePost()">Delete</button>
+                    </div>
+                </div>
+            </div>
+       </div>
     </div>
 
 	

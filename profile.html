@@ -1,0 +1,140 @@
+<?php
+    ob_start();
+    session_start();
+?>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>Support Circle</title>
+
+		<!-- Bootstrap core CSS -->
+		<link href="./vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+		<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
+
+		<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+		<link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+		<!-- Custom styles for this template -->
+		<link href="./css/clean-blog.min.css" rel="stylesheet">
+
+
+		<!-- Bootstrap core JavaScript -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		<!-- Custom scripts for this template -->
+		<script src="./js/clean-blog.min.js"></script>
+
+		
+		<script>
+            function confirm() {
+                console.log("keyed");
+                if($('#password').val()==$('#cpassword').val()) {
+                    console.log("match");
+                    $("#message").html("&#10003;");
+                    document.getElementById("message").setAttribute("style","visibility:visible;color:green");
+                }
+                else {
+                    console.log("no match");
+                    $("#message").html("&#10060;");
+                    document.getElementById("message").setAttribute("style","visibility:visible;color:red");
+                }
+            }
+		</script>
+
+        <script>
+            function update() {
+                var name=document.getElementById('name').value;
+                var email=document.getElementById('email').value;
+                var password=document.getElementById('password').value;
+                var cpassword=document.getElementById('cpassword').value;
+                var profile_pic=document.getElementById('propic').value;
+                if(password==cpassword) {
+                    $.ajax({
+                        method:'POST',
+                        url:'php/update_profile.php',
+                        data:{
+                            name:name,
+                            email:email,
+                            password:password,
+                            picture:profile_pic,
+                        },
+                        success:function(response) {
+                            alert(response);
+                        },
+                    });
+                }
+                else {
+                    alert('Passwords are not matching!');
+                }
+            }
+        </script>
+		
+	</head>
+	<body>
+		<div class="container" style="margin:2vh;">
+			<h1>Edit Profile</h1>
+		  	<hr>
+			<div class="row">
+			  <!-- left column -->
+			  <div class="col-md-3">
+				<div class="text-center">
+				  <img src="//placehold.it/100" class="avatar img-circle" alt="avatar">
+				  <h6 style="margin:1vh;">Upload a different photo...</h6>
+				  
+				  <input type="file" class="form-control" style="margin:auto;" name='propic' id='propic'>
+				</div>
+			  </div>
+			  
+			  <!-- edit form column -->
+			  <div class="col-md-9 personal-info">
+				
+				<h3>Personal info</h3>
+				
+				<form class="form-horizontal" role="form" action=''>
+				  <div class="form-group">
+				    <label class="col-lg-3 control-label">Name:</label>
+				    <div class="col-lg-8">
+                        <input class="form-control" type="text" id='name' name='name' value="<?php $_SESSION['user_name']?>">
+				    </div>
+				  </div>
+				  <div class="form-group">
+				    <label class="col-lg-3 control-label">Email:</label>
+				    <div class="col-lg-8">
+				      <input class="form-control" type="text" placeholder="janesemail@gmail.com" id='email' name='email'>
+				    </div>
+				  </div>
+				  
+				  <div class="form-group">
+				    <label class="col-md-3 control-label">Password:</label>
+				    <div class="col-md-8">
+				      <input class="form-control" type="password" id="password" name='password'>
+				    </div>
+				  </div>
+				  <div class="form-group">
+				    <label class="col-md-3 control-label">Confirm password:</label>
+				    <div class="col-md-8" id='conpass'>
+				      <input class="form-control" type="password" onkeyup="confirm()" id="cpassword" name='cpassword'>
+                      <span id="message">&#10003; </span>
+				    </div>
+				  </div>
+				  <div class="form-group">
+				    <label class="col-md-3 control-label"></label>
+				    <div class="col-md-8">
+				      <input type="button" class="btn btn-primary" value="Save Changes" onclick="update()" name='update'>
+				      <input type="reset" class="btn btn-default" value="Cancel">
+				    </div>
+				  </div>
+				</form>
+			  </div>
+		  </div>
+		</div>
+		<hr>
+	</body>
+</html>

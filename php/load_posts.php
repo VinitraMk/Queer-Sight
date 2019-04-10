@@ -1,16 +1,18 @@
 <?php
+ob_start();
 session_start();
 include("config.php");
 
 $db=mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
 if(isset($db)) {
-    #echo "<script>console.log('Connected to dp:');</script>";
-    $selectposts="SELECT * FROM qpost ORDER BY date,time DESC LIMIT 3";
+    echo "<script>console.log('Connected to dp:');</script>";
+    $selectposts="SELECT * FROM qpost ORDER BY post_id DESC LIMIT 3";
     $res=mysqli_query($db,$selectposts);
     $count=mysqli_num_rows($res);
-    #echo "Res: ".$row;
+    #echo "Res: ".$count;
     $page_content=""; 
     while($row=mysqli_fetch_array($res,MYSQLI_ASSOC)) {
+        echo "<script>console.log('Post id: ".$row['post_id']."');</script>";
         $puserid=$row['user_id'];
         $sql="SELECT * FROM quser WHERE user_id='$puserid'";
         $res1=mysqli_query($db,$sql);
@@ -33,6 +35,12 @@ if(isset($db)) {
               <a href='#'>".$userrow['name']."</a>
               on ".$row['date']."</p>
           </div>";
+            if(isset($_SESSION['userid']) && $_SESSION['userid']==$row['user_id']) {
+                $onclick_param="deletePost(".$row['post_id'].")";
+                #$page_content.="<a href='#' data-target='#deletemodal' data-toggle='modal' style='float:right'>Delete Post</a></br>";
+                $page_content.="<a href='#' onclick=$onclick_param style='float:right'>Delete Post</a></br>";
+
+            }
             $page_content.="<hr>";
         }
     }
